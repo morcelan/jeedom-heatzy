@@ -1,0 +1,54 @@
+{
+    "plugins\/heatzy\/desktop\/php\/heatzy.php": {
+        "Rechercher": "Rechercher",
+        "Gestion": "Gestion",
+        "Configuration": "Configuration",
+        "Santé": "Santé",
+        "Mes Heatzy": "Mes Heatzy",
+        "Sauvegarder": "Sauvegarder",
+        "Supprimer": "Supprimer",
+        "Équipement": "Équipement",
+        "Commandes": "Commandes",
+        "Général": "Général",
+        "Nom de l'équipement": "Nom de l'équipement",
+        "Objet parent": "Objet parent",
+        "Aucun": "Aucun",
+        "Catégorie": "Catégorie",
+        "Activer": "Activer",
+        "Visible": "Visible",
+        "MAC": "MAC",
+        "DID": "DID",
+        "Informations": "Informations",
+        "Création": "Création",
+        "Date de création de l'équipement": "Date de création de l'équipement",
+        "Dernière communication": "Dernière communication",
+        "Dernière mise à jour": "Dernière mise à jour",
+        "Nom": "Nom",
+        "Type": "Type",
+        "Paramètres": "Paramètres"
+    },
+    "plugins\/heatzy\/plugin_info\/info.json": {
+        "Plugin heatzy": "Plugin heatzy"
+    },
+    "plugins\/heatzy\/desktop\/js\/heatzy.js": {
+        "Santé": "Santé"
+    },
+    "plugins\/heatzy\/desktop\/modal\/health.php": {
+        "Module": "Module",
+        "DID": "DID",
+        "MAC": "MAC",
+        "MAC": "MAC",
+	"Dernière mise à jour": "Dernière mise à jour",
+	"Dernière communication": "Dernière communication",
+	"Date création": "Date création"
+    },
+    "plugins\/heatzy\/plugin_info\/configuration.php": {
+        "Général": "Général",
+        "Email": "Email",
+        "Mot de passe": "Mot de passe",
+        "Token": "Token",
+        "Aide": "Aide",
+        "Documentation locale": "Documentation locale",
+        "Synchroniser": "Synchroniser"
+    }
+}
