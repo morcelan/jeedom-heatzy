@@ -3,7 +3,7 @@ Heatzy
 
 Description
 === 
-Ce plugin permet de gérer vos modules Heatzy pilote.
+Ce plugin permet de gérer vos modules pilote et flam de la marque Heatzy.
 
 Pré-requis
 === 
