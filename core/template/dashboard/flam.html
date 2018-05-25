@@ -17,7 +17,7 @@
   				if(_options.display_value == 1) {
 					$('.prog#EtatProgId#').attr('title', 'Désactiver la programmation');
                     $('.prog#EtatProgId# i.programmation').empty().append('<i class="fa fa-toggle-on progoff" style="font-size : 1.1em;color: #00FF00;"></i>');
-                    $('.prog#EtatProgId#').parent().attr('data-cmd_id', '#cmd_progon_id#');
+                    $('.prog#EtatProgId#').parent().attr('data-cmd_id', '#cmd_progoff_id#');
                 }
   				else {
 					$('.prog#EtatProgId#').attr('title', 'Activer la programmation');
@@ -28,12 +28,11 @@
         	jeedom.cmd.update['#EtatProgId#']({display_value:'#ProgEtat#'});
 
             $('.cmd[data-cmd_id=#cmd_progon_id#] .progon').on('click', function () {
-              jeedom.cmd.execute({id: '#cmd_progon_id#'});
+                jeedom.cmd.execute({id: '#cmd_progon_id#'});
             });
 
             $('.cmd[data-cmd_id=#cmd_progoff_id#] .progoff').on('click', function () {
-              jeedom.cmd.execute({id: '#cmd_progoff_id#'});
-
+                jeedom.cmd.execute({id: '#cmd_progoff_id#'});
   			});
   		</script>
     </div>
