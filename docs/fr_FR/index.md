@@ -61,7 +61,7 @@ Configuration des commandes des objets connectés Heatzy
 
 ### Wigdet dashboard pilote
 
-![heatzy4](../images/widget_dashbord.png)
+![heatzy4](../images/widget_dashbaord.png)
 
 ### Wigdet dashboard flam
 
