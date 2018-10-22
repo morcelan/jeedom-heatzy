@@ -164,6 +164,12 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value) {
 					<span class="eqLogicAttr label label-default" data-l1key="configuration" data-l2key="heatzytype" title="{{Type de module}}" style="font-size : 1em;cursor : default;"></span>
 				</div>
 			</div>
+            <div class="form-group">
+				<label class="col-sm-3 control-label">{{Produit}}</label>
+				<div class="col-sm-3">
+					<span class="eqLogicAttr label label-default" data-l1key="configuration" data-l2key="product" title="{{Type de produit}}" style="font-size : 1em;cursor : default;"></span>
+				</div>
+			</div>
 		</fieldset>
 	</form>
 </div>
