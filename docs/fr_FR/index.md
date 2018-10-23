@@ -54,7 +54,8 @@ Vous retrouvez dans la section **Informations**
 * **Création** : date et heure de création de l'équipement
 * **Dernière communication** : date et heure de la dernière communication du module Heatzy dans le cloud
 * **Dernière mise à jour** : date et heure de mise à jour de l'équipement
-* *Type** : pilote ou flam
+* **Type** : pilote ou flam
+* **Produit** : le type de produit de la marque heatzy
 
 Configuration des commandes des objets connectés Heatzy
 -------------
@@ -77,7 +78,7 @@ Chaque équipement dispose des commandes actions :
 * **Confort** : permet de passer en mode confort
 * **Eco** : permet de passer en mode eco
 * **HorsGel** : permet de passer en mode hors-gel
-* refresh : permet forcer le rafraichissement de l'etat de l'équipement
+* **refresh** : permet forcer le rafraichissement de l'etat de l'équipement
 * **Activer Programmation** : permet d'activer la programmation, pré-définie par l'application Heatzy
 * **Désactiver Programmation** : permet d'activer la programmation, pré-définie par l'application Heatzy
 * **Plugzy OFF** : Permet d'éteindre le plugzy *(seulement pour l'équipement de type flam)*
@@ -132,4 +133,8 @@ Le token d'accès au cloud change à chaque synchronisation. Un nouveau token es
 **Mon équipement n'est pas rafraîchi ?**
 
 Vérifiez si l'équipement est bien activé.
+                                               
+**Je viens de mettre à jour le plugin, que dois-je faire ?**
+
+Il est conseillé de synchroniser les modules via la page de configuration du plugin.                            
 

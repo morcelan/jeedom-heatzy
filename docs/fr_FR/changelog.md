@@ -1,3 +1,7 @@
+# 22/10/2018
+
+- Prise en charge des modules pilotes version 2018
+
 # 06/05/2018
 
 - Intégration et prise en charge des modules Flam et Plugzy
