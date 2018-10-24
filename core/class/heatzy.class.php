@@ -43,7 +43,10 @@ class HttpGizwits {
     public static function Login($User, $Passwd, $Lang='en') {
          
             if(empty($User) || empty($Passwd))
+                {
+                log::add('heatzy', 'debug',  __METHOD__.': argument invalide');
                 return false;
+                }
     
             /// Preparation de la requete : json
             $data = json_encode( array('username' => $User, 'password' => $Passwd, 'lang' => $Lang) ) ;
@@ -82,7 +85,10 @@ class HttpGizwits {
             curl_close($gizwits);
 
             if( $httpcode == 500 )
-                return false;
+              {
+              log::add('heatzy', 'debug',  __METHOD__.': erreur 500');
+              return false;
+              }
             
             ///Décodage de la réponse
             $aRep = json_decode($result, true);
@@ -103,7 +109,10 @@ class HttpGizwits {
     public static function GetProduitInfo($ProductKey) {
         
         if(empty($ProductKey))
+            {
+            log::add('heatzy', 'debug',  __METHOD__.': argument invalide');
             return false;
+            }
         
         /// Parametres cUrl
         $params = array(
@@ -134,7 +143,10 @@ class HttpGizwits {
         curl_close($gizwits);
 
         if( $httpcode == 500 )
-            return false;
+              {
+              log::add('heatzy', 'debug',  __METHOD__.': erreur 500');
+              return false;
+              }
 
         ///Décodage de la réponse
         $aRep = json_decode($result, true);
@@ -155,7 +167,10 @@ class HttpGizwits {
     public static function Bindings($UserToken) {
         
         if(empty($UserToken))
+            {
+            log::add('heatzy', 'debug',  __METHOD__.': argument invalide');
             return false;
+            }
         
         /// Parametres cUrl
         $params = array(
@@ -187,7 +202,10 @@ class HttpGizwits {
         curl_close($gizwits);
 
         if( $httpcode == 500 )
-            return false;
+              {
+              log::add('heatzy', 'debug',  __METHOD__.': erreur 500');
+              return false;
+              }
 
         ///Décodage de la réponse
         $aRep = json_decode($result, true);
@@ -210,7 +228,10 @@ class HttpGizwits {
     public static function GetSchedulerList($UserToken, $Did, $Skip = 0, $Limit = 20) {
     
         if(empty($UserToken) || empty($Did))
+            {
+            log::add('heatzy', 'debug',  __METHOD__.': argument invalide');
             return false;
+            }
     
         log::add('heatzy', 'debug',  __METHOD__.':skip '.$Skip);
         /// Parametres cUrl
@@ -243,7 +264,10 @@ class HttpGizwits {
         curl_close($gizwits);
 
         if( $httpcode == 500 )
-            return false;
+              {
+              log::add('heatzy', 'debug',  __METHOD__.': erreur 500');
+              return false;
+              }
 
         ///Décodage de la réponse
         $aRep = json_decode($result, true);
@@ -267,7 +291,10 @@ class HttpGizwits {
     public static function SetScheduler($UserToken, $Did, $Id, $Param) {
     
         if(empty($UserToken) || empty($Did) || empty($Id) || empty($Param))
+            {
+            log::add('heatzy', 'debug',  __METHOD__.': argument invalide');
             return false;
+            }
     
         /// Preparation de la requete : json
         $data = json_encode( $Param ) ;
@@ -308,7 +335,10 @@ class HttpGizwits {
         curl_close($gizwits);
 
         if( $httpcode == 500 )
+              {
+              log::add('heatzy', 'debug',  __METHOD__.': erreur 500');
               return false;
+              }
         
         ///Décodage de la réponse
         $aRep = json_decode($result, true);
@@ -331,7 +361,10 @@ class HttpGizwits {
     public static function SetBindingInformation($UserToken, $Did, $DevAlias) {
     
         if(empty($UserToken) || empty($Did) || empty($DevAlias))
+            {
+            log::add('heatzy', 'debug',  __METHOD__.': argument invalide');
             return false;
+            }
 
         /// Preparation de la requete : json
         $data = json_encode( array('dev_alias' => $DevAlias ) ) ;
@@ -372,7 +405,10 @@ class HttpGizwits {
         curl_close($gizwits);
 
         if( $httpcode == 500 )
-            return false;
+              {
+              log::add('heatzy', 'debug',  __METHOD__.': erreur 500');
+              return false;
+              }
 
         ///Décodage de la réponse
         $aRep = json_decode($result, true);
@@ -395,7 +431,10 @@ class HttpGizwits {
     public static function SetConsigne($UserToken, $Did, $Consigne) {
         
         if(empty($UserToken) || empty($Did) || empty($Consigne))
-          return false;
+            {
+            log::add('heatzy', 'debug',  __METHOD__.': argument invalide');
+            return false;
+            }
 
         /// Preparation de la requete : json
         $data = json_encode( $Consigne ) ;
@@ -436,7 +475,10 @@ class HttpGizwits {
         curl_close($gizwits);
 
         if( $httpcode == 500 )
-          return false;
+              {
+              log::add('heatzy', 'debug',  __METHOD__.': erreur 500');
+              return false;
+              }
 
         ///Décodage de la réponse
         $aRep = json_decode($result, true);
@@ -455,7 +497,10 @@ class HttpGizwits {
     public static function GetConsigne($Did) {
         
         if(empty($Did))
+            {
+            log::add('heatzy', 'debug',  __METHOD__.': argument invalide');
             return false;
+            }
         
         /// Parametres cUrl
         $params = array(
@@ -484,7 +529,10 @@ class HttpGizwits {
         curl_close($gizwits);
 
         if( $httpcode == 500 )
-          return false;
+              {
+              log::add('heatzy', 'debug',  __METHOD__.': erreur 500');
+              return false;
+              }
       
         ///Décodage de la réponse
         $aRep = json_decode($result, true);
@@ -506,7 +554,10 @@ class HttpGizwits {
     public static function GetDeviceDetails($UserToken, $Did) {
     
         if(empty($Did))
+            {
+            log::add('heatzy', 'debug',  __METHOD__.': argument invalide');
             return false;
+            }
     
         /// Parametres cUrl
         $params = array(
@@ -538,7 +589,10 @@ class HttpGizwits {
         curl_close($gizwits);
 
         if( $httpcode == 500 )
-            return false;
+              {
+              log::add('heatzy', 'debug',  __METHOD__.': erreur 500');
+              return false;
+              }
         
         /// Décodage de la réponse
         $aRep = json_decode($result, true);
@@ -577,7 +631,7 @@ class heatzy extends eqLogic {
         /// Login
         $aResult = HttpGizwits::Login($email, $password );
         if ($aResult === false) {
-            log::add('heatzy', 'error',  'Impossible de se connecter a: '.HttpGizwits::$UrlGizwits);
+            log::add('heatzy', 'error', __METHOD__.' : impossible de se connecter a: '.HttpGizwits::$UrlGizwits);
             return false;
         }
         log::add('heatzy', 'debug',  '$aResult :'.var_export($aResult, true));
@@ -617,7 +671,7 @@ class heatzy extends eqLogic {
         /// Bindings
         $aDevices = HttpGizwits::Bindings($UserToken);
         if($aDevices === false) {
-            log::add('heatzy', 'error',  'Impossible de se connecter à:'.HttpGizwits::$UrlGizwits);
+            log::add('heatzy', 'error',  __METHOD__.' : impossible de se connecter à:'.HttpGizwits::$UrlGizwits);
             return false;
         }
         
@@ -693,7 +747,7 @@ class heatzy extends eqLogic {
             /// Lecture de l'etat
             $aDevice = HttpGizwits::GetConsigne($this->getLogicalId());
             if($aDevice === false) {
-                log::add('heatzy', 'error',  'Impossible de se connecter à:'.HttpGizwits::$UrlGizwits);
+                log::add('heatzy', 'error',  __METHOD__.' : impossible de se connecter à:'.HttpGizwits::$UrlGizwits);
                 $this->setStatus('timeout','1');
                 $this->save();
                 return false;
@@ -1369,7 +1423,7 @@ class heatzyCmd extends cmd {
               
                   $Result = HttpGizwits::SetConsigne($UserToken, $eqLogic->getLogicalId(), $Consigne);
                 if($Result === false) {
-                    log::add('heatzy', 'error',  'Impossible de se connecter à:'.HttpGizwits::$UrlGizwits);
+                    log::add('heatzy', 'error',  __METHOD__.' : impossible de se connecter à:'.HttpGizwits::$UrlGizwits);
                     return false;
                 }
               
@@ -1384,7 +1438,7 @@ class heatzyCmd extends cmd {
               
                 $Result = HttpGizwits::SetConsigne($UserToken, $eqLogic->getLogicalId(), $Consigne);
                 if($Result === false) {
-                    log::add('heatzy', 'error',  'Impossible de se connecter à:'.HttpGizwits::$UrlGizwits);
+                    log::add('heatzy', 'error',  __METHOD__.' : impossible de se connecter à:'.HttpGizwits::$UrlGizwits);
                     return false;
                 }
               
@@ -1448,7 +1502,7 @@ class heatzyCmd extends cmd {
                 }
                 $Result = HttpGizwits::SetConsigne($UserToken, $eqLogic->getLogicalId(), $Consigne);
                 if($Result === false) {
-                    log::add('heatzy', 'error',  'Impossible de se connecter à:'.HttpGizwits::$UrlGizwits);
+                    log::add('heatzy', 'error',  __METHOD__.' : impossible de se connecter à:'.HttpGizwits::$UrlGizwits);
                     return false;
                 }
                 
