@@ -1,3 +1,8 @@
+# 18/11/2018
+
+- Synchronisation automatique si le code retour Gizwits est 9004
+- Ajout de la clé du produit
+
 # 22/10/2018
 
 - Prise en charge des modules pilotes version 2018

@@ -482,9 +482,9 @@ class HttpGizwits {
 
         ///Décodage de la réponse
         $aRep = json_decode($result, true);
-        if(isset($aRep['error_message'])) {
-            throw new Exception(__('Gizwits erreur : ', __FILE__) . $aRep['error_code'].' '.$aRep['error_message'] . __(', detail :  ', __FILE__) .$aRep['detail_message']);
-        }
+     //   if(isset($aRep['error_message'])) {
+     //       throw new Exception(__('Gizwits erreur : ', __FILE__) . $aRep['error_code'].' '.$aRep['error_message'] . __(', detail :  ', __FILE__) .$aRep['detail_message']);
+     //   }
         return $aRep;
     }
     /**
@@ -536,9 +536,9 @@ class HttpGizwits {
       
         ///Décodage de la réponse
         $aRep = json_decode($result, true);
-        if(isset($aRep['error_message'])) {
-            throw new Exception(__('Gizwits erreur : ', __FILE__) . $aRep['error_code'].' '.$aRep['error_message'] . __(', detail :  ', __FILE__) .$aRep['detail_message']);
-        }
+        //if(isset($aRep['error_message'])) {
+        //    throw new Exception(__('Gizwits erreur : ', __FILE__) . $aRep['error_code'].' '.$aRep['error_message'] . __(', detail :  ', __FILE__) .$aRep['detail_message']);
+       // }
         log::add('heatzy', 'debug',  __METHOD__.':'.var_export($aRep, true));
         return $aRep;
     }
@@ -700,14 +700,17 @@ class heatzy extends eqLogic {
 
             /// Retourne les informations sur le produit
             $aProductInfo = HttpGizwits::GetProduitInfo($aDevice['product_key']) ;
-
+            
             /// Recherche le type de module
             //$aStatus = HttpGizwits::GetConsigne($aDevice['did']);
             //if($aStatus === false) {
             //    log::add('heatzy', 'error',  'Impossible de se connecter à:'.HttpGizwits::$UrlGizwits);
             //     continue;
             //}
-            $eqLogic->setConfiguration('product',$aProductInfo['name']);
+            if (isset ($aProductInfo['name']))
+                $eqLogic->setConfiguration('product',$aProductInfo['name']);
+            if (isset ($aProductInfo['product_key']))
+                $eqLogic->setConfiguration('product_key',$aProductInfo['product_key']);
             
             if (! strncmp ( $aProductInfo['name'] , "Flam" , 4 ) )
                  $eqLogic->setConfiguration('heatzytype','flam');
@@ -752,6 +755,31 @@ class heatzy extends eqLogic {
                 $this->save();
                 return false;
             }
+             ///// --- TEST ----
+            else if(isset($aDevice['error_message']) && isset($aDevice['error_code'])) {
+                if($aDevice['error_code'] === '9004') {
+                    log::add('heatzy', 'error',  __METHOD__.' : '.$aDevice['error_code'].' '.$aDevice['error_message']);
+                    $Nb = $eqLogic->Synchronize();
+                    if ($Nb == false) {
+                        log::add('heatzy', 'error',  __METHOD__.' : erreur synchronisation');
+                        return false;
+                }
+                else{
+                    log::add('heatzy', 'info',  __METHOD__.' : '.$Nb. 'module(s) synchronise(s)');
+                    $UserToken = config::byKey('UserToken','heatzy','none');
+                    $aDevice = HttpGizwits::SetConsigne($UserToken, $eqLogic->getLogicalId(), $Consigne);
+                    if(isset($aDevice['error_message']) && isset($aDevice['error_code'])) {
+                      log::add('heatzy', 'error',  __METHOD__.' : '.$aDevice['error_code'].' - '.$aDevice['error_message']);
+                      return false;
+                    }
+                }
+            }
+            else {
+                log::add('heatzy', 'error',  __METHOD__.' : '.$aDevice['error_code'].' - '.$aDevice['error_message']);
+                return false;
+            }
+          }
+          ///// --- FIN TEST ----
         }
       
         /// Mise à jour de la derniere communication
@@ -1505,6 +1533,31 @@ class heatzyCmd extends cmd {
                     log::add('heatzy', 'error',  __METHOD__.' : impossible de se connecter à:'.HttpGizwits::$UrlGizwits);
                     return false;
                 }
+                  ///// --- TEST  SI LE TOKEN EST INVALIDE ON SYNCHRONISE----
+                else if(isset($Result['error_message']) && isset($Result['error_code'])) {
+                	if($Result['error_code'] === '9004') {
+                		log::add('heatzy', 'error',  __METHOD__.' : '.$Result['error_code'].' '.$Result['error_message']);
+                		$Nb = $eqLogic->Synchronize();
+                		if ($Nb == false) {
+                			log::add('heatzy', 'error',  __METHOD__.' : erreur synchronisation');
+                			return false;
+                		}
+                		else{
+                			log::add('heatzy', 'info',  __METHOD__.' : '.$Nb. 'module(s) synchronise(s)');
+                			$UserToken = config::byKey('UserToken','heatzy','none');
+                			$Result = HttpGizwits::SetConsigne($UserToken, $eqLogic->getLogicalId(), $Consigne);
+                            if(isset($Result['error_message']) && isset($Result['error_code'])) {
+                                log::add('heatzy', 'error',  __METHOD__.' : '.$Result['error_code'].' - '.$Result['error_message']);
+                                return false;
+                            }
+                		}
+                	}
+                	else {
+                        log::add('heatzy', 'error',  __METHOD__.' : '.$Result['error_code'].' - '.$Result['error_message']);
+                        return false;
+                    }
+                }
+                  ///// --- FIN TEST ----
                 
                 /// Mise à jour de l'état
                 $this->getEqLogic()->updateHeatzyDid();
