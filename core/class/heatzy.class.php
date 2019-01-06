@@ -712,7 +712,8 @@ class heatzy extends eqLogic {
             if (isset ($aProductInfo['product_key']))
                 $eqLogic->setConfiguration('product_key',$aProductInfo['product_key']);
             
-            if (! strncmp ( $aProductInfo['name'] , "Flam" , 4 ) )
+	    if (! strncmp ( $aProductInfo['name'] , "Flam" , 4 ) 
+	       || ! strncmp( $aProductInfo['name'] , "INEA" , 4) )
                  $eqLogic->setConfiguration('heatzytype','flam');
             else
                  $eqLogic->setConfiguration('heatzytype','pilote');
@@ -789,7 +790,7 @@ class heatzy extends eqLogic {
             $this->setConfiguration('lastCommunication', date('Y-m-d H:i:s', $aDevice['updated_at']));
         }
 
-        if( $this->getConfiguration('heatzytype', 'pilote') == 'flam') {        /// Pour heatzy flam mais par defaut le pilote
+        if( $this->getConfiguration('heatzytype', 'pilote') == 'flam') {        /// Pour heatzy flam ou inea mais par defaut le pilote
           
             if( $aDevice['attr']['mode'] == 'cft' ) {  /// Confort
                 $KeyMode = 'Confort';
@@ -1173,7 +1174,7 @@ class heatzy extends eqLogic {
             $mode->save();
         }
       
-        if( $this->getConfiguration('heatzytype', 'pilote') == 'flam') {    /// Pour heatzy flam
+        if( $this->getConfiguration('heatzytype', 'pilote') == 'flam') {    /// Pour heatzy flam ou inea
           
           /// Creation de la commande info du plugzy
           $Plugzy = $this->getCmd(null, 'plugzy'); 
@@ -1342,7 +1343,7 @@ class heatzy extends eqLogic {
         $ProgOn = $this->getCmd(null,'ProgOn');
         $replace['#cmd_progon_id#'] = (is_object($ProgOn)) ? $ProgOn->getId() : '';
       
-        if( $this->getConfiguration('heatzytype', 'pilote') == 'flam') {     /// Pour heatzy flam mais par defaut le pilote
+        if( $this->getConfiguration('heatzytype', 'pilote') == 'flam') {     /// Pour heatzy flam ou inea mais par defaut le pilote
     /* if(1) {    /// Pour heatzy flam
           
             $replace['#history_temp#'] = 'history cursor';
@@ -1491,7 +1492,7 @@ class heatzyCmd extends cmd {
               
                 log::add('heatzy', 'debug', __METHOD__.' '.$this->getLogicalId() . ' mode = '. $Mode);
               
-                if( $eqLogic->getConfiguration('heatzytype', 'pilote') == 'flam') {    /// Pour heatzy flam mais par defaut le pilote
+                if( $eqLogic->getConfiguration('heatzytype', 'pilote') == 'flam') {    /// Pour heatzy flam ou inea mais par defaut le pilote
                   
                     switch($Mode[0])
                         {

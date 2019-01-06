@@ -1,3 +1,7 @@
+# 06/01/2019
+
+- Ajout du module INEA. Le module est géré de la même maniere que le module FLAM
+
 # 18/11/2018
 
 - Synchronisation automatique si le code retour Gizwits est 9004
