@@ -710,10 +710,11 @@ class heatzy extends eqLogic {
             if (isset ($aProductInfo['name']))
                 $eqLogic->setConfiguration('product',$aProductInfo['name']);
             if (isset ($aProductInfo['product_key']))
-                $eqLogic->setConfiguration('product_key',$aProductInfo['product_key']);
-            
-	    if (! strncmp ( $aProductInfo['name'] , "Flam" , 4 ) 
-	       || ! strncmp( $aProductInfo['name'] , "INEA" , 4) )
+		        $eqLogic->setConfiguration('product_key',$aProductInfo['product_key']);
+
+            if  ( strcmp( $aProductInfo['name'] , "INEA" ) === 0 )
+                 $eqLogic->setConfiguration('heatzytype','flam');
+	        else if ( strncmp ( $aProductInfo['name'] , "Flam" , 4 ) === 0 )
                  $eqLogic->setConfiguration('heatzytype','flam');
             else
                  $eqLogic->setConfiguration('heatzytype','pilote');
@@ -790,7 +791,7 @@ class heatzy extends eqLogic {
             $this->setConfiguration('lastCommunication', date('Y-m-d H:i:s', $aDevice['updated_at']));
         }
 
-        if( $this->getConfiguration('heatzytype', 'pilote') == 'flam') {        /// Pour heatzy flam ou inea mais par defaut le pilote
+        if(isset($aDevice['attr']['mode'])) {
           
             if( $aDevice['attr']['mode'] == 'cft' ) {  /// Confort
                 $KeyMode = 'Confort';
@@ -804,53 +805,11 @@ class heatzy extends eqLogic {
             else if( $aDevice['attr']['mode'] == 'stop' ) { /// Off
                 $KeyMode = 'Off';
             }
-            else {
-                log::add('heatzy', 'debug',  __METHOD__.': '.$this->getLogicalId().' non connecte');
-                $this->setStatus('timeout','1');
-                $this->save(); /// Enregistre les info
-                return false;
-            }
-          
-          if( isset ($aDevice['attr']['on_off']) )
-              $this->checkAndUpdateCmd('plugzy', $aDevice['attr']['on_off'] );
-          
-          if( isset ($aDevice['attr']['eco_tempH']) && isset ($aDevice['attr']['eco_tempL']) )
-              $this->checkAndUpdateCmd('eco_temp', floatval( bindec(str_pad(decbin($aDevice['attr']['eco_tempH']),  8, "0", STR_PAD_LEFT).str_pad(decbin($aDevice['attr']['eco_tempL']),  8, "0", STR_PAD_LEFT))) / 10 );
-          
-          if( isset ($aDevice['attr']['cft_tempH']) && isset ($aDevice['attr']['cft_tempL']) )
-              $this->checkAndUpdateCmd('cft_temp', floatval( bindec(str_pad(decbin($aDevice['attr']['cft_tempH']),  8, "0", STR_PAD_LEFT).str_pad(decbin($aDevice['attr']['cft_tempL']),  8, "0", STR_PAD_LEFT))) / 10 );
-          
-          if( isset ($aDevice['attr']['cur_tempH']) && isset ($aDevice['attr']['cur_tempL']) )
-              $this->checkAndUpdateCmd('cur_temp', floatval( bindec(str_pad(decbin($aDevice['attr']['cur_tempH']),  8, "0", STR_PAD_LEFT).str_pad(decbin($aDevice['attr']['cur_tempL']),  8, "0", STR_PAD_LEFT))) / 10 );
-        }
-        else {                                                    /// Pour heatzy pilote
-            if( $this->getConfiguration('product', 'Heatzy') == 'Pilote2') { ///Version 2 du module pilote
-                if( $aDevice['attr']['mode'] == 'cft' ) {  /// Confort
-                    $KeyMode = 'Confort';
-                }
-                else if( $aDevice['attr']['mode'] == 'eco' ) { /// Eco
-                    $KeyMode = 'Eco';
-                }
-                else if( $aDevice['attr']['mode'] == 'fro' ) { /// HorsGel
-                    $KeyMode = 'HorsGel';
-                }
-                else if( $aDevice['attr']['mode'] == 'stop' ) { /// Off
-                    $KeyMode = 'Off';
-                }
-                else {
-                    log::add('heatzy', 'debug',  __METHOD__.': '.$this->getLogicalId().' non connecte');
-                    $this->setStatus('timeout','1');
-                    $this->save(); /// Enregistre les info
-                    return false;
-                 }
-            }
-            else {                                              /// Premiere version du module pilote
+            else {                                            /// Premiere version du module pilote
                 $mode1 = $mode2 = 0;
-                if(isset($aDevice['attr']['mode'])) {
-                    $mode1=ord(substr($aDevice['attr']['mode'], 1,1));
-                    $mode2=ord(substr($aDevice['attr']['mode'], 2,1));
-                }
-        
+                $mode1=ord(substr($aDevice['attr']['mode'], 1,1));
+                $mode2=ord(substr($aDevice['attr']['mode'], 2,1));
+              
                 if($mode1 == 136 && $mode2 == 146) {  /// Confort
                     $KeyMode = 'Confort';
                 }
@@ -870,6 +829,24 @@ class heatzy extends eqLogic {
                     return false;
                 }
             }
+          
+          if( isset ($aDevice['attr']['on_off']) )
+              $this->checkAndUpdateCmd('plugzy', $aDevice['attr']['on_off'] );
+          
+          if( isset ($aDevice['attr']['eco_tempH']) && isset ($aDevice['attr']['eco_tempL']) )
+              $this->checkAndUpdateCmd('eco_temp', floatval( bindec(str_pad(decbin($aDevice['attr']['eco_tempH']),  8, "0", STR_PAD_LEFT).str_pad(decbin($aDevice['attr']['eco_tempL']),  8, "0", STR_PAD_LEFT))) / 10 );
+          
+          if( isset ($aDevice['attr']['cft_tempH']) && isset ($aDevice['attr']['cft_tempL']) )
+              $this->checkAndUpdateCmd('cft_temp', floatval( bindec(str_pad(decbin($aDevice['attr']['cft_tempH']),  8, "0", STR_PAD_LEFT).str_pad(decbin($aDevice['attr']['cft_tempL']),  8, "0", STR_PAD_LEFT))) / 10 );
+          
+          if( isset ($aDevice['attr']['cur_tempH']) && isset ($aDevice['attr']['cur_tempL']) )
+              $this->checkAndUpdateCmd('cur_temp', floatval( bindec(str_pad(decbin($aDevice['attr']['cur_tempH']),  8, "0", STR_PAD_LEFT).str_pad(decbin($aDevice['attr']['cur_tempL']),  8, "0", STR_PAD_LEFT))) / 10 );
+        }
+        else {                                             
+          log::add('heatzy', 'debug',  __METHOD__.': '.$this->getLogicalId().' non connecte');
+          $this->setStatus('timeout','1');
+          $this->save(); /// Enregistre les info
+          return false;
         }
         $this->save(); /// Enregistre les info
         /// Recherche la valeur de la clef du mode courant
@@ -1492,25 +1469,10 @@ class heatzyCmd extends cmd {
               
                 log::add('heatzy', 'debug', __METHOD__.' '.$this->getLogicalId() . ' mode = '. $Mode);
               
-                if( $eqLogic->getConfiguration('heatzytype', 'pilote') == 'flam') {    /// Pour heatzy flam ou inea mais par defaut le pilote
-                  
-                    switch($Mode[0])
-                        {
-                        case 0:
-                           $Mode = 'cft'; break;
-                        case 1:
-                           $Mode = 'eco'; break;
-                        case 2:
-                           $Mode = 'fro'; break;
-                        case 3:
-                           $Mode = 'stop'; break;
-                        }
-                  
-                    $Consigne = array( 'attrs' => array ( 'mode' => $Mode )  );
+                if( $eqLogic->getConfiguration('product', 'Heatzy') == 'Heatzy') {    /// Premiere version du module pilote
+                    $Consigne = array( 'raw' => array(1, 1, $Mode[0]) ) ;
                 }
                 else {
-                    if( $eqLogic->getConfiguration('product', 'Heatzy') == 'Pilote2') {
-                      
                         switch($Mode[0])
                         {
                         case 0:
@@ -1524,10 +1486,6 @@ class heatzyCmd extends cmd {
                         }
                   
                     $Consigne = array( 'attrs' => array ( 'mode' => $Mode )  );
-                    }
-                    else {   /// Premiere version du module pilote
-                       $Consigne = array( 'raw' => array(1, 1, $Mode[0]) ) ;
-                    }
                 }
                 $Result = HttpGizwits::SetConsigne($UserToken, $eqLogic->getLogicalId(), $Consigne);
                 if($Result === false) {
