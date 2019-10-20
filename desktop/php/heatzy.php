@@ -44,14 +44,10 @@ foreach ($eqLogics as $eqLogic) {
 	$opacity = ($eqLogic->getIsEnable()) ? '' : jeedom::getConfiguration('eqLogic:style:noactive');
 	echo '<div class="eqLogicDisplayCard cursor" data-eqLogic_id="' . $eqLogic->getId() . '" style="background-color : #ffffff; height : 200px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;' . $opacity . '" >';
 	echo "<center>";
-    if($eqLogic->getConfiguration('product', 'pilote')=='INEA') 	        /// Pour heatzy INEA
-        echo '<img src="plugins/heatzy/docs/images/LOGO_PILOTE.png"  width="100" height="100"/>';
-    else if($eqLogic->getConfiguration('heatzytype', 'pilote')=='flam') 	/// Pour heatzy flam mais par defaut le pilote
-        echo '<img src="plugins/heatzy/docs/images/LOGO_FLAM.png"  width="100" height="100"/>';
-	    //echo '<img src="plugins/heatzy/doc/images/heatzy_flam.png" />';
+    if($eqLogic->getConfiguration('product', '')=='Flam_Week2') 	        /// Pour heatzy INEA
+    	echo '<img src="plugins/heatzy/docs/images/LOGO_FLAM.png"  width="100" height="100"/>';
     else
         echo '<img src="plugins/heatzy/docs/images/LOGO_PILOTE.png" width="100" height="100"/>';
-        //echo '<img src="plugins/heatzy/doc/images/heatzy-pilote.png" />';
 	echo "</center>";
 	echo '<span style="font-size : 1.1em;position:relative; top : 15px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;"><center>' . $eqLogic->getHumanName(true, true) . '</center></span>';
 	echo '</div>';
@@ -158,12 +154,6 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value) {
 				<label class="col-sm-3 control-label">{{Dernière mise à jour}}</label>
 				<div class="col-sm-3">
 					<span class="eqLogicAttr label label-default" data-l1key="configuration" data-l2key="updatetime" title="{{Date de dernière communication}}" style="font-size : 1em;cursor : default;"></span>
-				</div>
-			</div>
-			<div class="form-group">
-				<label class="col-sm-3 control-label">{{Type}}</label>
-				<div class="col-sm-3">
-					<span class="eqLogicAttr label label-default" data-l1key="configuration" data-l2key="heatzytype" title="{{Type de module}}" style="font-size : 1em;cursor : default;"></span>
 				</div>
 			</div>
             <div class="form-group">

@@ -26,10 +26,10 @@ $eqLogics = heatzy::byType('heatzy');
 	<thead>
 		<tr>
 			<th>{{Module}}</th>
-  			<th>{{Type}}</th>
+  		<th>{{Type}}</th>
 			<th>{{DID}}</th>
 			<th>{{MAC}}</th>
-            <th>{{Connecté}}</th>
+      <th>{{Connecté}}</th>
 			<th>{{Dernière mise à jour}}</th>
 			<th>{{Dernière communication}}</th>
 			<th>{{Date création}}</th>
@@ -40,7 +40,7 @@ $eqLogics = heatzy::byType('heatzy');
 foreach ($eqLogics as $eqLogic) {
 	echo '<tr><td><a href="' . $eqLogic->getLinkToConfiguration() . '" style="text-decoration: none;">' . $eqLogic->getHumanName(true) . '</a></td>';
   																															/// Pour heatzy flam mais par defaut le pilote
-  	echo '<td><span class="label label-info" style="font-size : 1em; cursor : default;">' . $eqLogic->getConfiguration('heatzytype', 'pilote') . '</span></td>';
+  	echo '<td><span class="label label-info" style="font-size : 1em; cursor : default;">' . $eqLogic->getConfiguration('product', 'Heatzy') . '</span></td>';
 	echo '<td><span class="label label-info" style="font-size : 1em; cursor : default;">' . $eqLogic->getLogicalId() . '</span></td>';
 	echo '<td><span class="label label-info" style="font-size : 1em; cursor : default;">' . $eqLogic->getConfiguration('mac') . '</span></td>';
     if( $eqLogic->getStatus('timeout') == '1')

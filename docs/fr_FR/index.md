@@ -5,6 +5,15 @@ Description
 === 
 Ce plugin permet de gérer vos modules pilote et flam de la marque Heatzy.
 
+Les modules gérés sont :
+
+* **Heatzy**
+* **Flam/Plugzy**
+* **INEA**
+* **Pilote seconde génération**
+* **Pilote SoC**
+* **Elec Pro (Acova version)**
+
 Pré-requis
 === 
 L'utilisation de ce plugin requiert de créer un compte avec l'application Heatzy disponible sur Android et iOS.
@@ -118,13 +127,13 @@ FAQ
 
 **Quelle est la fréquence de rafraîchissement ?**
 
-Le système récupère l'état du module Heatzy toutes les minutes. L'état de la programmation est rafraîchie toutes les 30 minutes.
+Le système récupère l'état des modules toutes les minutes. L'état de la programmation est rafraîchie toutes les 30 minutes pour les modules Heatzy et Flam.
 
->Il est possible de désactiver le rafraîchissement de l'état de la programmation en décochant la fonctionnalités **con30** depuis la page de configuration du plugin.
+>Pour les modules Heatzy et Flam, il est possible de désactiver le rafraîchissement de l'état de la programmation en décochant la fonctionnalités **con30** depuis la page de configuration du plugin. Pour les autres modules la programmation est lu dans la commande **timer_switch**.
 
 **Lorsque je désactive la programmation, l'état n'est pas mis à jour ?**
 
-Le plugin met à jour les 336 tâches associées au module Heatzy pour les désactiver/activer, soit 336 requêtes HTTP envoyé au cloud Heatzy. Il est donc nécessaire d'attendre quelques secondes que le plugin finisse d'activer/désactiver chacune des tâches. L’état de la programmation est mis à jour si tous ce passe bien.
+Le plugin met à jour les 336 tâches associées au module Heatzy ou Flam pour les désactiver/activer, soit 336 requêtes HTTP envoyé au cloud Heatzy. Il est donc nécessaire d'attendre quelques secondes que le plugin finisse d'activer/désactiver chacune des tâches. L’état de la programmation est mis à jour si tous ce passe bien.
 
 **Quelle est la durée de vie du token utilisateur d'accès au cloud ?**
 

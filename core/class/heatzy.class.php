@@ -2,19 +2,19 @@
 
 /* This file is part of Jeedom.
  *
- * Jeedom is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Jeedom is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Jeedom. If not, see <http://www.gnu.org/licenses/>.
- */
+* Jeedom is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* Jeedom is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with Jeedom. If not, see <http://www.gnu.org/licenses/>.
+*/
 
 /* * ***************************Includes********************************* */
 require_once dirname(__FILE__) . '/../../../../core/php/core.inc.php';
@@ -611,7 +611,13 @@ class HttpGizwits {
  */
 class heatzy extends eqLogic {
     /*     * *************************Attributs****************************** */
-    public static $_widgetPossibility = array('custom' => true, 'custom::layout' => false);
+  //  public static $_widgetPossibility = array('custom' => true, 'custom::layout' => false);
+    
+    public static $_widgetPossibility = array('custom' => array(
+      'visibility' => true,
+      'displayName' => array('dashboard' => true, 'view' => true),
+      'optionalParameters' => true,
+));
   
     /**
      * @var $_HeatzyMode Différent mode de fonctionnement du module heatzy
@@ -701,16 +707,10 @@ class heatzy extends eqLogic {
             /// Retourne les informations sur le produit
             $aProductInfo = HttpGizwits::GetProduitInfo($aDevice['product_key']) ;
             
-            /// Recherche le type de module
-            //$aStatus = HttpGizwits::GetConsigne($aDevice['did']);
-            //if($aStatus === false) {
-            //    log::add('heatzy', 'error',  'Impossible de se connecter à:'.HttpGizwits::$UrlGizwits);
-            //     continue;
-            //}
             if (isset ($aProductInfo['name']))
                 $eqLogic->setConfiguration('product',$aProductInfo['name']);
             if (isset ($aProductInfo['product_key']))
-		        $eqLogic->setConfiguration('product_key',$aProductInfo['product_key']);
+		        		$eqLogic->setConfiguration('product_key',$aProductInfo['product_key']);
 
             if  ( strcmp( $aProductInfo['name'] , "INEA" ) === 0 )
                  $eqLogic->setConfiguration('heatzytype','flam');
@@ -718,21 +718,14 @@ class heatzy extends eqLogic {
                  $eqLogic->setConfiguration('heatzytype','flam');
             else
                  $eqLogic->setConfiguration('heatzytype','pilote');
-
-            /// Si on_off existe (etat plugzy) il s'agit flam
-            //if( array_key_exists ('on_off' , $aStatus['attr']) )
-            //    $eqLogic->setConfiguration('heatzytype','flam');
-            //else
-            //    $eqLogic->setConfiguration('heatzytype','pilote');
           
             /// Si connecté ou pas
-              if(isset($aDevice['is_online'])) {
+            if(isset($aDevice['is_online'])) {
                 if($aDevice['is_online'] == 'true')
                     $eqLogic->setStatus('timeout','0');
                 else
                     $eqLogic->setStatus('timeout','1');
-            }
-                            
+            }            
             $eqLogic->save();
                           
             if ($eqLogic->getIsEnable() == 1) { /// mise à jour du did
@@ -830,7 +823,7 @@ class heatzy extends eqLogic {
                 }
             }
           
-          if( isset ($aDevice['attr']['on_off']) )
+          if( isset ($aDevice['attr']['on_off']) && $this->getConfiguration('product', '') == 'Flam_Week2')
               $this->checkAndUpdateCmd('plugzy', $aDevice['attr']['on_off'] );
           
           if( isset ($aDevice['attr']['eco_tempH']) && isset ($aDevice['attr']['eco_tempL']) )
@@ -841,6 +834,9 @@ class heatzy extends eqLogic {
           
           if( isset ($aDevice['attr']['cur_tempH']) && isset ($aDevice['attr']['cur_tempL']) )
               $this->checkAndUpdateCmd('cur_temp', floatval( bindec(str_pad(decbin($aDevice['attr']['cur_tempH']),  8, "0", STR_PAD_LEFT).str_pad(decbin($aDevice['attr']['cur_tempL']),  8, "0", STR_PAD_LEFT))) / 10 );
+          
+          if( isset ($aDevice['attr']['timer_switch']) )
+          		$this->checkAndUpdateCmd('etatprog', $aDevice['attr']['timer_switch'] );
         }
         else {                                             
           log::add('heatzy', 'debug',  __METHOD__.': '.$this->getLogicalId().' non connecte');
@@ -942,17 +938,25 @@ class heatzy extends eqLogic {
       
       /**
        * Fonction exécutée automatiquement toutes les 30minutes par Jeedom
+       * seulement pour les modules Heatzy et Flam_Week2
        * */
        public static function cron30() {
            
            foreach (eqLogic::byType('heatzy') as $heatzy) {
-               if($heatzy->getIsEnable() == 1 ){
+           	
+               if($heatzy->getIsEnable() != 1 )
+               	continue;
+               
+               if($heatzy->getConfiguration('product', 'Heatzy') != 'Flam_Week2' &&
+    							$heatzy->getConfiguration('product', 'Heatzy') != 'Heatzy' )
+               	continue;
+               
                 $EtatProg='1'; /// Par defaut les taches sont actives
               
                 /// Si le module est en timeout on ne verifie pas la programmation
-                   if ( $heatzy->getStatus('timeout', '0') == '1' ) {
+								if ( $heatzy->getStatus('timeout', '0') == '1' ) {
                     /// Mise à jour de l'etat de la programmation désactivé
-                       $EtatProg='0';
+                    $EtatProg='0';
                 }
                 else {
                   /// Lecture des taches de ce module
@@ -1001,7 +1005,7 @@ class heatzy extends eqLogic {
                    $heatzy->toHtml('mobile');
                    $heatzy->toHtml('dashboard');
                    $heatzy->refreshWidget();
-                   }/// Fin module actif
+
                }/// Fin boucle des modules
        }
 
@@ -1064,36 +1068,50 @@ class heatzy extends eqLogic {
                 $cmd->save();
             }
         }
-
-        $cmd = $this->getCmd(null, 'ProgOn');
-        if (!is_object($cmd)) {
-            $cmd = new heatzyCmd();
-            $cmd->setLogicalId('ProgOn');
-            $cmd->setIsVisible(1);
-            $cmd->setName(__('Activer Programmation', __FILE__));
-            $cmd->setType('action');
-            $cmd->setSubType('other');
-            $cmd->setConfiguration('infoName', 'etatprog');
-            $cmd->setEqLogic_id($this->getId());
-            $cmd->setIsHistorized(0);
-            $cmd->setIsVisible(1);
-            $cmd->save();
-        }
-        
-        $cmd = $this->getCmd(null, 'ProgOff');
-        if (!is_object($cmd)) {
-            $cmd = new heatzyCmd();
-            $cmd->setLogicalId('ProgOff');
-            $cmd->setIsVisible(1);
-            $cmd->setName(__('Désactiver Programmation', __FILE__));
-            $cmd->setType('action');
-            $cmd->setSubType('other');
-            $cmd->setConfiguration('infoName', 'etatprog');
-            $cmd->setEqLogic_id($this->getId());
-            $cmd->setIsHistorized(0);
-            $cmd->setIsVisible(1);
-            $cmd->save();
-        }
+            
+	        $cmd = $this->getCmd(null, 'ProgOn');
+	        if (!is_object($cmd)) {
+	            $cmd = new heatzyCmd();
+	            $cmd->setLogicalId('ProgOn');
+	            $cmd->setIsVisible(1);
+	            $cmd->setName(__('Activer Programmation', __FILE__));
+	            $cmd->setType('action');
+	            $cmd->setSubType('other');
+	            $cmd->setConfiguration('infoName', 'etatprog');
+	            $cmd->setEqLogic_id($this->getId());
+	            $cmd->setIsHistorized(0);
+	            $cmd->setIsVisible(1);
+	            $cmd->save();
+	        }
+	        
+	        $cmd = $this->getCmd(null, 'ProgOff');
+	        if (!is_object($cmd)) {
+	            $cmd = new heatzyCmd();
+	            $cmd->setLogicalId('ProgOff');
+	            $cmd->setIsVisible(1);
+	            $cmd->setName(__('Désactiver Programmation', __FILE__));
+	            $cmd->setType('action');
+	            $cmd->setSubType('other');
+	            $cmd->setConfiguration('infoName', 'etatprog');
+	            $cmd->setEqLogic_id($this->getId());
+	            $cmd->setIsHistorized(0);
+	            $cmd->setIsVisible(1);
+	            $cmd->save();
+	        }
+	        
+	        /// Creation de la commande info etatprog binaire
+	        $etat = $this->getCmd(null, 'etatprog');
+	        if (!is_object($etat)) {
+	            $etat = new heatzyCmd();
+	            $etat->setName(__('Etat programmation', __FILE__));
+	            $etat->setLogicalId('etatprog');
+	            $etat->setType('info');
+	            $etat->setSubType('binary');
+	            $etat->setEqLogic_id($this->getId());
+	            $etat->setIsHistorized(0);
+	            $etat->setIsVisible(1);
+	            $etat->save();
+	        }
 
         /// Creation de la commande de rafraichissement
         $refresh = $this->getCmd(null, 'refresh');
@@ -1107,20 +1125,6 @@ class heatzy extends eqLogic {
             $refresh->setIsHistorized(0);
             $refresh->setIsVisible(1);
             $refresh->save();
-        }
-
-        /// Creation de la commande info etatprog binaire
-        $etat = $this->getCmd(null, 'etatprog');
-        if (!is_object($etat)) {
-            $etat = new heatzyCmd();
-            $etat->setName(__('Etat programmation', __FILE__));
-            $etat->setLogicalId('etatprog');
-            $etat->setType('info');
-            $etat->setSubType('binary');
-            $etat->setEqLogic_id($this->getId());
-            $etat->setIsHistorized(0);
-            $etat->setIsVisible(1);
-            $etat->save();
         }
 
         /// Creation de la commande info Etat numeric
@@ -1150,54 +1154,57 @@ class heatzy extends eqLogic {
             $mode->setIsVisible(1);
             $mode->save();
         }
-      
-        if( $this->getConfiguration('heatzytype', 'pilote') == 'flam') {    /// Pour heatzy flam ou inea
-          
-          /// Creation de la commande info du plugzy
-          $Plugzy = $this->getCmd(null, 'plugzy'); 
-          if (!is_object($Plugzy)) {
-              $Plugzy = new heatzyCmd();
-              $Plugzy->setName(__('Plugzy', __FILE__));
-              $Plugzy->setLogicalId('plugzy');
-              $Plugzy->setType('info');
-              $Plugzy->setSubType('binary');
-              $Plugzy->setEqLogic_id($this->getId());
-              $Plugzy->setIsHistorized(0);
-              $Plugzy->setIsVisible(1);
-              $Plugzy->save();
+        
+    		if ( $this->getConfiguration('product', '') == 'Flam_Week2' ) {
+	          /// Creation de la commande info du plugzy
+	          $Plugzy = $this->getCmd(null, 'plugzy'); 
+	          if (!is_object($Plugzy)) {
+	              $Plugzy = new heatzyCmd();
+	              $Plugzy->setName(__('Plugzy', __FILE__));
+	              $Plugzy->setLogicalId('plugzy');
+	              $Plugzy->setType('info');
+	              $Plugzy->setSubType('binary');
+	              $Plugzy->setEqLogic_id($this->getId());
+	              $Plugzy->setIsHistorized(0);
+	              $Plugzy->setIsVisible(1);
+	              $Plugzy->save();
+	          }
+	          
+	          /// Creation de la commande plugzy on
+	          $cmd = $this->getCmd(null, 'plugzyon');
+	          if (!is_object($cmd)) {
+	            $cmd = new heatzyCmd();
+	            $cmd->setLogicalId('plugzyon');
+	            $cmd->setIsVisible(1);
+	            $cmd->setName(__('Plugzy ON', __FILE__));
+	            $cmd->setType('action');
+	            $cmd->setSubType('other');
+	            $cmd->setConfiguration('infoName', 'plugzy');
+	            $cmd->setEqLogic_id($this->getId());
+	            $cmd->setIsHistorized(0);
+	            $cmd->setIsVisible(1);
+	            $cmd->save();
+	          }
+	          
+	          /// Creation de la commande plugzy off
+	          $cmd = $this->getCmd(null, 'plugzyoff');
+	          if (!is_object($cmd)) {
+	            $cmd = new heatzyCmd();
+	            $cmd->setLogicalId('plugzyoff');
+	            $cmd->setIsVisible(1);
+	            $cmd->setName(__('Plugzy OFF', __FILE__));
+	            $cmd->setType('action');
+	            $cmd->setSubType('other');
+	            $cmd->setConfiguration('infoName', 'plugzy');
+	            $cmd->setEqLogic_id($this->getId());
+	            $cmd->setIsHistorized(0);
+	            $cmd->setIsVisible(1);
+	            $cmd->save();
+	          }
           }
-          
-          /// Creation de la commande plugzy on
-          $cmd = $this->getCmd(null, 'plugzyon');
-          if (!is_object($cmd)) {
-            $cmd = new heatzyCmd();
-            $cmd->setLogicalId('plugzyon');
-            $cmd->setIsVisible(1);
-            $cmd->setName(__('Plugzy ON', __FILE__));
-            $cmd->setType('action');
-            $cmd->setSubType('other');
-            $cmd->setConfiguration('infoName', 'plugzy');
-            $cmd->setEqLogic_id($this->getId());
-            $cmd->setIsHistorized(0);
-            $cmd->setIsVisible(1);
-            $cmd->save();
-          }
-          
-          /// Creation de la commande plugzy off
-          $cmd = $this->getCmd(null, 'plugzyoff');
-          if (!is_object($cmd)) {
-            $cmd = new heatzyCmd();
-            $cmd->setLogicalId('plugzyoff');
-            $cmd->setIsVisible(1);
-            $cmd->setName(__('Plugzy OFF', __FILE__));
-            $cmd->setType('action');
-            $cmd->setSubType('other');
-            $cmd->setConfiguration('infoName', 'plugzy');
-            $cmd->setEqLogic_id($this->getId());
-            $cmd->setIsHistorized(0);
-            $cmd->setIsVisible(1);
-            $cmd->save();
-          }
+        
+        if( $this->getConfiguration('product', '') == 'Flam_Week2' ||
+            $this->getConfiguration('product', '') == 'INEA') {    /// Pour heatzy flam ou inea
           
           /// Creation de la commande info de la temperature de confort
           $CftTemp = $this->getCmd(null, 'cft_temp'); 
@@ -1285,6 +1292,7 @@ class heatzy extends eqLogic {
             return $replace;
         }
         $_version = jeedom::versionAlias($_version);
+        $product = $this->getConfiguration('product', '');
         
         $replace['#collectDate#'] = $this->getConfiguration('updatetime', '');
      
@@ -1309,10 +1317,9 @@ class heatzy extends eqLogic {
         $Off = $this->getCmd(null,'Off');
         $replace['#cmd_off_id#'] = (is_object($Off)) ? $Off->getId() : '';
 
-        
         $Etat = $this->getCmd(null,'etatprog');
-        $replace['#ProgEtat#'] = (is_object($Etat)) ? $Etat->execCmd() : '';
-        $replace['#EtatProgId#'] = (is_object($Etat)) ? $Etat->getId() : '';
+        $replace['#info_prog#'] = (is_object($Etat)) ? $Etat->execCmd() : '';
+        $replace['#cmd_prog_id#'] = (is_object($Etat)) ? $Etat->getId() : '';
       
         $ProgOff = $this->getCmd(null,'ProgOff');
         $replace['#cmd_progoff_id#'] = (is_object($ProgOff)) ? $ProgOff->getId() : '';
@@ -1320,37 +1327,20 @@ class heatzy extends eqLogic {
         $ProgOn = $this->getCmd(null,'ProgOn');
         $replace['#cmd_progon_id#'] = (is_object($ProgOn)) ? $ProgOn->getId() : '';
       
-        if( $this->getConfiguration('heatzytype', 'pilote') == 'flam') {     /// Pour heatzy flam ou inea mais par defaut le pilote
-    /* if(1) {    /// Pour heatzy flam
-          
-            $replace['#history_temp#'] = 'history cursor';
-            $replace['#cur_temp_id#'] = '99999';
-            $replace['#cur_temp#'] = '20.8';
-            $replace['#unite_cur_temp#'] = '°C';
-          
-            $replace['#eco_temp_id#'] = '99998';
-            $replace['#eco_temp#'] = '15';
-            $replace['#unite_eco_temp#'] ='°C';
-          
-            $replace['#cft_temp_id#'] = '9997';
-            $replace['#cft_temp#'] = '20';
-            $replace['#unite_cft_temp#'] = '°C';
-         
-            $replace['#plugzy#'] = '0';
-            $replace['#plugzyId#'] = '999996';
-            $replace['#cmd_plugzyon_id#'] = '999995';
-            $replace['#cmd_plugzyoff_id#'] = '999994';
-*/ 
-            $plugzy = $this->getCmd(null,'plugzy');
-            $replace['#plugzy#'] = (is_object($plugzy)) ? $plugzy->execCmd() : '';
-            $replace['#plugzyId#'] = (is_object($plugzy)) ? $plugzy->getId() : '';
+        if( $product == 'Flam_Week2' 
+         || $product == 'INEA') {     /// Pour heatzy flam ou inea mais par defaut le pilote
 
-            $plugzyon = $this->getCmd(null,'plugzyon');
-            $replace['#cmd_plugzyon_id#'] = (is_object($plugzyon)) ? $plugzyon->getId() : '';
-
-            $plugzyoff = $this->getCmd(null,'plugzyoff');
-            $replace['#cmd_plugzyoff_id#'] = (is_object($plugzyoff)) ? $plugzyoff->getId() : '';
- 
+            if($product == 'Flam_Week2') {
+	            $plugzy = $this->getCmd(null,'plugzy');
+	            $replace['#info_plugzy#'] = (is_object($plugzy)) ? $plugzy->execCmd() : '';
+	            $replace['#cmd_plugzy_id#'] = (is_object($plugzy)) ? $plugzy->getId() : '';
+	
+	            $plugzyon = $this->getCmd(null,'plugzyon');
+	            $replace['#cmd_plugzyon_id#'] = (is_object($plugzyon)) ? $plugzyon->getId() : '';
+	
+	            $plugzyoff = $this->getCmd(null,'plugzyoff');
+	            $replace['#cmd_plugzyoff_id#'] = (is_object($plugzyoff)) ? $plugzyoff->getId() : '';
+ 			     }
             $CurTemp = $this->getCmd(null,'cur_temp');
             if( is_object($CurTemp)) {
                 $replace['#history_cur_temp#'] = ($CurTemp->getIsHistorized())? 'history cursor' : '';
@@ -1377,13 +1367,9 @@ class heatzy extends eqLogic {
               $replace['#cft_temp#'] = $CftTemp->execCmd();
               $replace['#unite_cft_temp#'] = $CftTemp->getUnite();
             }    
-
-            $html = template_replace($replace, getTemplate('core', $_version, 'flam','heatzy'));
         }
-        else {
-            $html = template_replace($replace, getTemplate('core', $_version, 'pilote','heatzy'));
-        }
-        
+        $html = template_replace($replace, getTemplate('core', $_version, $product,'heatzy'));
+       // cache::set('heatzy' . $_version . $this->getId(), $html, 0);
         return $html;
     }
 
@@ -1409,6 +1395,7 @@ class heatzyCmd extends cmd {
      */
 
     public function execute($_options = array()) {
+        $Result = array();
         
         if ($this->getLogicalId() == 'refresh') {
             $this->getEqLogic()->updateHeatzyDid();
@@ -1419,55 +1406,71 @@ class heatzyCmd extends cmd {
         else if($this->getType() == 'action' ) {
             
             $eqLogic = $this->getEqLogic();
+            
+            /// Lecture du token
+            $UserToken = config::byKey('UserToken','heatzy','none');
           
             if ($this->getLogicalId() == 'plugzyon') {
         
                 $Consigne = array( 'attrs' => array ( 'on_off' => 1 )  );
-              
-                  /// Lecture du token
-                $UserToken = config::byKey('UserToken','heatzy','none');
-              
-                  $Result = HttpGizwits::SetConsigne($UserToken, $eqLogic->getLogicalId(), $Consigne);
+
+                $Result = HttpGizwits::SetConsigne($UserToken, $eqLogic->getLogicalId(), $Consigne);
                 if($Result === false) {
                     log::add('heatzy', 'error',  __METHOD__.' : impossible de se connecter à:'.HttpGizwits::$UrlGizwits);
                     return false;
                 }
-              
-                $eqLogic->checkAndUpdateCmd($this->getConfiguration('infoName'), 1);
+                else
+                	$eqLogic->checkAndUpdateCmd($this->getConfiguration('infoName'), 1);
             }
             else if ($this->getLogicalId() == 'plugzyoff') {
               
-                  $Consigne = array( 'attrs' => array ( 'on_off' => 0 )  );
-              
-                  /// Lecture du token
-                $UserToken = config::byKey('UserToken','heatzy','none');
+                $Consigne = array( 'attrs' => array ( 'on_off' => 0 )  );
               
                 $Result = HttpGizwits::SetConsigne($UserToken, $eqLogic->getLogicalId(), $Consigne);
                 if($Result === false) {
                     log::add('heatzy', 'error',  __METHOD__.' : impossible de se connecter à:'.HttpGizwits::$UrlGizwits);
                     return false;
                 }
-              
-                $eqLogic->checkAndUpdateCmd($this->getConfiguration('infoName'), 0);
+              	else 
+                	$eqLogic->checkAndUpdateCmd($this->getConfiguration('infoName'), 0);
             }
             else if ($this->getLogicalId() == 'ProgOn') {
+            	
+            	if( $eqLogic->getConfiguration('product', '') == 'Heatzy' ||
+            			$eqLogic->getConfiguration('product', '') == 'Flam_Week2')
                 $eqLogic->GestProg(true);
-                
-                $eqLogic->checkAndUpdateCmd($this->getConfiguration('infoName'), 1);
+              else {
+              	$Consigne = array( 'attrs' => array ( 'timer_switch' => 1 )  );
+              	
+              	$Result = HttpGizwits::SetConsigne($UserToken, $eqLogic->getLogicalId(), $Consigne);
+              	if($Result === false) {
+              		log::add('heatzy', 'error',  __METHOD__.' : impossible de se connecter à:'.HttpGizwits::$UrlGizwits);
+              		return false;
+              	}
+              }
+              $eqLogic->checkAndUpdateCmd($this->getConfiguration('infoName'), 1);
             }
             else if ($this->getLogicalId() == 'ProgOff') {
+            	
+							if( $eqLogic->getConfiguration('product', '') == 'Heatzy' ||
+            			$eqLogic->getConfiguration('product', '') == 'Flam_Week2')
                 $eqLogic->GestProg(false);
-
-                $eqLogic->checkAndUpdateCmd($this->getConfiguration('infoName'), 0);
+              else {
+              	$Consigne = array( 'attrs' => array ( 'timer_switch' => 0 )  );
+              	
+              	$Result = HttpGizwits::SetConsigne($UserToken, $eqLogic->getLogicalId(), $Consigne);
+              	if($Result === false) {
+              		log::add('heatzy', 'error',  __METHOD__.' : impossible de se connecter à:'.HttpGizwits::$UrlGizwits);
+              		return false;
+              	}
+              }
+              $eqLogic->checkAndUpdateCmd($this->getConfiguration('infoName'), 0);
             }
             else {
-                /// Lecture du token
-                $UserToken = config::byKey('UserToken','heatzy','none');
-                
-                              
+
                 $Mode = array_keys(heatzy::$_HeatzyMode, $this->getLogicalId());
               
-                log::add('heatzy', 'debug', __METHOD__.' '.$this->getLogicalId() . ' mode = '. $Mode);
+                log::add('heatzy', 'debug', __METHOD__.' '.$this->getLogicalId() . ' mode = '. var_export($Mode, true));
               
                 if( $eqLogic->getConfiguration('product', 'Heatzy') == 'Heatzy') {    /// Premiere version du module pilote
                     $Consigne = array( 'raw' => array(1, 1, $Mode[0]) ) ;
@@ -1492,36 +1495,37 @@ class heatzyCmd extends cmd {
                     log::add('heatzy', 'error',  __METHOD__.' : impossible de se connecter à:'.HttpGizwits::$UrlGizwits);
                     return false;
                 }
-                  ///// --- TEST  SI LE TOKEN EST INVALIDE ON SYNCHRONISE----
-                else if(isset($Result['error_message']) && isset($Result['error_code'])) {
-                	if($Result['error_code'] === '9004') {
-                		log::add('heatzy', 'error',  __METHOD__.' : '.$Result['error_code'].' '.$Result['error_message']);
-                		$Nb = $eqLogic->Synchronize();
-                		if ($Nb == false) {
-                			log::add('heatzy', 'error',  __METHOD__.' : erreur synchronisation');
-                			return false;
-                		}
-                		else{
-                			log::add('heatzy', 'info',  __METHOD__.' : '.$Nb. 'module(s) synchronise(s)');
-                			$UserToken = config::byKey('UserToken','heatzy','none');
-                			$Result = HttpGizwits::SetConsigne($UserToken, $eqLogic->getLogicalId(), $Consigne);
-                            if(isset($Result['error_message']) && isset($Result['error_code'])) {
-                                log::add('heatzy', 'error',  __METHOD__.' : '.$Result['error_code'].' - '.$Result['error_message']);
-                                return false;
-                            }
-                		}
-                	}
-                	else {
-                        log::add('heatzy', 'error',  __METHOD__.' : '.$Result['error_code'].' - '.$Result['error_message']);
-                        return false;
-                    }
-                }
-                  ///// --- FIN TEST ----
-                
-                /// Mise à jour de l'état
-                $this->getEqLogic()->updateHeatzyDid();
+            }/// Le mode
+            
+            /// Si une erreur de communication et token invalide on se re-synchronise
+            if(isset($Result['error_message']) && isset($Result['error_code'])) {
+            	if($Result['error_code'] === '9004') {
+            		log::add('heatzy', 'error',  __METHOD__.' : '.$Result['error_code'].' '.$Result['error_message']);
+            		$Nb = $eqLogic->Synchronize();
+            		if ($Nb == false) {
+            			log::add('heatzy', 'error',  __METHOD__.' : erreur synchronisation');
+            			return false;
+            		}
+            		else{
+            			log::add('heatzy', 'info',  __METHOD__.' : '.$Nb. 'module(s) synchronise(s)');
+            			$UserToken = config::byKey('UserToken','heatzy','none');
+            			$Result = HttpGizwits::SetConsigne($UserToken, $eqLogic->getLogicalId(), $Consigne);
+            			if(isset($Result['error_message']) && isset($Result['error_code'])) {
+            				log::add('heatzy', 'error',  __METHOD__.' : '.$Result['error_code'].' - '.$Result['error_message']);
+            				return false;
+            			}
+            		}
+            	}
+            	else {
+            		log::add('heatzy', 'error',  __METHOD__.' : '.$Result['error_code'].' - '.$Result['error_message']);
+            		return false;
+            	}
             }
-        }
+            
+            /// Mise à jour de l'état
+            $this->getEqLogic()->updateHeatzyDid();
+            
+        } /// Fin action
         $mc = cache::byKey('heatzyWidgetmobile' . $this->getEqLogic()->getId());
         $mc->remove();
         $mc = cache::byKey('heatzyWidgetdashboard' . $this->getEqLogic()->getId());

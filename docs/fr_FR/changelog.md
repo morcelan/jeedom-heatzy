@@ -1,3 +1,9 @@
+# 20/10/2019
+
+- Affichage compatible pour jeedom v4
+- Chaque modules disposent d'un template
+- La commande timer_switch est utilisé pour activer/désactiver la programmation des modules seconde génération et INEA
+
 # 06/01/2019
 
 - Ajout du module INEA. Le module est géré de la même maniere que le module FLAM
