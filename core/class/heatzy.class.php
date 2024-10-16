@@ -494,7 +494,7 @@ class HttpGizwits {
      * 
      * @return Un tableau associatif ou false en cas d'erreur
      */
-    public static function GetConsigne($Did) {
+    public static function GetConsigne($UserToken, $Did) {
         
         if(empty($Did))
             {
